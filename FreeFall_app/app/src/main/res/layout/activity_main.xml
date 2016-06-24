@@ -9,8 +9,21 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="instrum.freefall_app.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Spinner
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/pairedBlth" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Large Text"
+            android:id="@+id/textView" />
+    </LinearLayout>
 </RelativeLayout>
