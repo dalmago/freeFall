@@ -3,4 +3,10 @@
     <string name="app_name">FreeFall_app</string>
     <string name="connect">Conectar</string>
     <string name="settings">Configurações</string>
+    <string name="blth_error_access">Não foi possível acessar o Bluetooth</string>
+    <string name="blth_error_pair">Você deve parear o dispositivo Bluetooth</string>
+    <string name="blth_error_turnon">Por favor ligue o Bluetooth</string>
+    <string name="blth_error_chooseSettings">Por favor escolha o dispositivo nas configurações</string>
+    <string name="blth_disconnected">Desconectado</string>
+    <string name="blth_connected">Conectado</string>
 </resources>
