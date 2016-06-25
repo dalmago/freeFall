@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">FreeFall_app</string>
+    <string name="connect">Connect</string>
+    <string name="settings">Settings</string>
 </resources>
