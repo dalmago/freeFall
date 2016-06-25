@@ -3,9 +3,6 @@ package instrum.freefall_app;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -20,6 +17,8 @@ import instrum.freefall_app.MainActivity;
  */
 public class ConnectBluetooth extends Thread{
 
+    private final String handshaking = "ready!";
+    private final String handshakingAns = "start!";
     private final BluetoothSocket mmSocket;
     private InputStream mmInStream;
     private OutputStream mmOutStream;
@@ -30,6 +29,7 @@ public class ConnectBluetooth extends Thread{
         // because mmSocket is final
         BluetoothSocket tmp = null;
         this.context = context;
+
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
             // MY_UUID is the app's UUID string, also used by the server code
@@ -48,7 +48,7 @@ public class ConnectBluetooth extends Thread{
         } catch (IOException connectException) {
             // Unable to connect; close the socket and get out
             MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
-                    (Object)"--Error connecting socket--").sendToTarget();
+                    "--Error connecting socket--").sendToTarget();
             try {
                 mmSocket.close();
             } catch (IOException closeException) {}
@@ -62,27 +62,61 @@ public class ConnectBluetooth extends Thread{
             mmOutStream = mmSocket.getOutputStream();
         } catch (IOException e) {
             MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
-                    (Object)"--Error getting socket streams--").sendToTarget();
+                    "--Error getting socket streams--").sendToTarget();
             this.cancel();
             return;
         }
         MainActivity.myHandler.obtainMessage(MainActivity.MSG_BLTH_CONNECTED).sendToTarget();
 
-        byte[] buffer = new byte[256];  // buffer store for the stream
-        int bytes; // bytes returned from read()
+        byte[] buffer = new byte[64];  // buffer store for the stream
 
+        // Handshake with bluetooth device
+        try {
+            String s = new String();
+            int count;
+
+            mmOutStream.write(handshaking.getBytes());
+
+            while (! s.contains(handshakingAns)){
+                if (mmInStream.available()>0){
+                    count = mmInStream.read(buffer, 0, 64);
+                    s = s.concat(new String(buffer).substring(0, count));
+                }
+
+                if (s.length() > 64){
+                    MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
+                            "--Error handshaking-- ").sendToTarget();
+                    this.cancel();
+                    return;
+                }
+
+            }
+
+        } catch(IOException e){
+            MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
+                "--Error sending/receiving handshake--").sendToTarget();
+            this.cancel();
+            return;
+        }
+
+        MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
+                "--Success handshaking--").sendToTarget();
+
+        int count;
         while (true) {
             try {
-                // Read from the InputStream
-                bytes = mmInStream.read(buffer);
-                // Send the obtained bytes to the UI activity
-                //mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget();
-                MainActivity.myHandler.obtainMessage(MainActivity.MSG_BLTH_RCVD, bytes,
-                        -1, buffer).sendToTarget();
+                if (mmInStream.available()>0) {
+                    // Read from the InputStream
+                    count = mmInStream.read(buffer);
+                    // Send the obtained bytes to the UI activity
+                    //mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                    MainActivity.myHandler.obtainMessage(MainActivity.MSG_BLTH_RCVD, count, -1, buffer)
+                            .sendToTarget();
+                }
 
             } catch (IOException e) {
                 MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
-                        (Object)"--Error reading stream--").sendToTarget();
+                        "--Error reading stream--").sendToTarget();
                 this.cancel();
                 break;
             }
