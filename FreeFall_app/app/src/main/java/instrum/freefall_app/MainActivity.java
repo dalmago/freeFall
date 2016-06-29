@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,22 +20,24 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import pl.pawelkleczkowski.customgauge.CustomGauge;
+
 public class MainActivity extends AppCompatActivity {
 
     private TextView outputTextView;
     private final int BLTHREQUESTCODE = 1;
     private BluetoothAdapter myBluetoothAdapter;
+    private boolean bluetoothInitialized = false;
+    private static List<BluetoothDevice> devices;
     private ConnectBluetooth connection;
+    private ProgressBar connectLoading;
+    private CustomGauge gauge;
 
     public static Handler myHandler;
     public final static int MSG_ERROR_BLTH=1;
     public final static int MSG_BLTH_CONNECTED=2;
     public final static int MSG_BLTH_DISCONNECTED=3;
     public final static int MSG_BLTH_RCVD=4;
-
-    public ProgressBar connectLoading;
-    public static boolean bluetoothInitialized = false;
-    public static List<BluetoothDevice> devices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +47,12 @@ public class MainActivity extends AppCompatActivity {
         connectLoading.setVisibility(View.INVISIBLE);
         outputTextView = (TextView) findViewById(R.id.outputTextView);
         outputTextView.setText("");
+        findViewById(R.id.disconnectButton).setVisibility(View.GONE);
+        findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
+        gauge = (CustomGauge)findViewById(R.id.gauge1);
 
         configureBluetooth();
+        new DefaultDevice(getApplicationContext());
 
         myHandler = new Handler(Looper.getMainLooper()){
             @Override
@@ -59,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
                             s1 = s1.concat(new Byte(x[i]).toString());
                         }
 
+                        gauge.setValue(x[0]);
+
                         outputTextView.setText(s1);
                         break;
 
@@ -70,10 +79,14 @@ public class MainActivity extends AppCompatActivity {
 
                     case MSG_BLTH_CONNECTED:
                         connectLoading.setVisibility(View.INVISIBLE);
+                        findViewById(R.id.disconnectButton).setVisibility(View.VISIBLE);
+                        findViewById(R.id.connectButton).setVisibility(View.GONE);
                         outputTextView.setText(R.string.blth_connected);
                         break;
 
                     case MSG_BLTH_DISCONNECTED:
+                        findViewById(R.id.disconnectButton).setVisibility(View.GONE);
+                        findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
                         outputTextView.setText(R.string.blth_disconnected);
                         break;
                 }
@@ -188,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             }
             return;
         }
-        if (!SettingsActivity.deviceSelected){
+        if (!SettingsActivity.isDeviceSelected() && !DefaultDevice.isDefaultDeviceAvailable()){
             if (devices.size() == 0)
                 Toast.makeText(getApplicationContext(), R.string.blth_error_pair,
                         Toast.LENGTH_SHORT).show();
@@ -198,11 +211,29 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        connection =  new ConnectBluetooth(SettingsActivity.selectedDevice,
-                SettingsActivity.selectedDevice.getUuids()[0].getUuid(),
-                getApplicationContext());
+        BluetoothDevice dev = null;
+        if (DefaultDevice.isDefaultDeviceAvailable()){
+            String s = DefaultDevice.getDefaultDevice();
+            for (BluetoothDevice d : devices){
+                if (d.getName().equals(s)) {
+                    dev = d;
+                    break;
+                }
+            }
+        }
+        if (dev == null)
+            dev = SettingsActivity.getSelectedDevice();
+        connection =  new ConnectBluetooth(dev, dev.getUuids()[0].getUuid(), getApplicationContext());
 
         connection.start();
         connectLoading.setVisibility(View.VISIBLE);
+    }
+
+    public void disconnectBluetooth(View v){
+        connection.cancel();
+    }
+
+    public static List<BluetoothDevice> getDevicesList(){
+        return devices;
     }
 }

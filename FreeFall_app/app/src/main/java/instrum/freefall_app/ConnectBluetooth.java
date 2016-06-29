@@ -10,8 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import instrum.freefall_app.MainActivity;
-
 /**
  * Created by dalmago on 6/25/16.
  */
@@ -66,7 +64,6 @@ public class ConnectBluetooth extends Thread{
             this.cancel();
             return;
         }
-        MainActivity.myHandler.obtainMessage(MainActivity.MSG_BLTH_CONNECTED).sendToTarget();
 
         byte[] buffer = new byte[64];  // buffer store for the stream
 
@@ -99,8 +96,7 @@ public class ConnectBluetooth extends Thread{
             return;
         }
 
-        MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
-                "--Success handshaking--").sendToTarget();
+        MainActivity.myHandler.obtainMessage(MainActivity.MSG_BLTH_CONNECTED).sendToTarget();
 
         int count;
         while (true) {
@@ -115,8 +111,6 @@ public class ConnectBluetooth extends Thread{
                 }
 
             } catch (IOException e) {
-                MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
-                        "--Error reading stream--").sendToTarget();
                 this.cancel();
                 break;
             }
@@ -130,7 +124,9 @@ public class ConnectBluetooth extends Thread{
             mmSocket.close();
         } catch (IOException e) {
             Toast.makeText(context, "--Error closing socket--", Toast.LENGTH_LONG).show();
+            return;
         }
+        MainActivity.myHandler.obtainMessage(MainActivity.MSG_BLTH_DISCONNECTED).sendToTarget();
     }
 
 }

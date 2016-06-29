@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:gauge="http://schemas.android.com/apk/res-auto"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -26,6 +27,13 @@
                 android:id="@+id/connectButton"
                 android:onClick="connectBlth" />
 
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/disconnect"
+                android:id="@+id/disconnectButton"
+                android:onClick="disconnectBluetooth" />
+
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -41,6 +49,24 @@
             android:id="@+id/outputTextView"
             android:layout_marginTop="20dp"
             android:lines="5" />
+
+        <pl.pawelkleczkowski.customgauge.CustomGauge
+            android:id="@+id/gauge1"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:paddingBottom="20dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="20dp"
+            gauge:pointStartColor="@color/yellow"
+            gauge:pointEndColor="@color/red"
+            gauge:startAngel="180"
+            gauge:strokeCap="ROUND"
+            gauge:strokeColor="@color/gray"
+            gauge:strokeWidth="10dp"
+            gauge:startValue="-128"
+            gauge:endValue="127"
+            gauge:sweepAngel="180" />
 
     </LinearLayout>
 </RelativeLayout>

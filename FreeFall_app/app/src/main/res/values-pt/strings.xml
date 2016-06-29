@@ -9,4 +9,7 @@
     <string name="blth_error_chooseSettings">Por favor escolha o dispositivo nas configurações</string>
     <string name="blth_disconnected">Desconectado</string>
     <string name="blth_connected">Conectado</string>
+    <string name="settings_default">Salvar como padrão</string>
+    <string name="settings_selected">selecionado</string>
+    <string name="disconnect">Desconectar</string>
 </resources>
