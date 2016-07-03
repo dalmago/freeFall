@@ -13,7 +13,8 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -50,23 +51,11 @@
             android:layout_marginTop="20dp"
             android:lines="5" />
 
-        <pl.pawelkleczkowski.customgauge.CustomGauge
-            android:id="@+id/gauge1"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:paddingBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:paddingTop="20dp"
-            gauge:pointStartColor="@color/yellow"
-            gauge:pointEndColor="@color/red"
-            gauge:startAngel="180"
-            gauge:strokeCap="ROUND"
-            gauge:strokeColor="@color/gray"
-            gauge:strokeWidth="10dp"
-            gauge:startValue="-128"
-            gauge:endValue="127"
-            gauge:sweepAngel="180" />
+        <com.cardiomood.android.controls.gauge.SpeedometerGauge
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:padding="8dp"
+            android:id="@+id/speedometer" />
 
     </LinearLayout>
 </RelativeLayout>

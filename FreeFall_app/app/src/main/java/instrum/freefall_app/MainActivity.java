@@ -3,6 +3,7 @@ package instrum.freefall_app;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -12,15 +13,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cardiomood.android.controls.gauge.SpeedometerGauge;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import pl.pawelkleczkowski.customgauge.CustomGauge;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,13 +31,14 @@ public class MainActivity extends AppCompatActivity {
     private static List<BluetoothDevice> devices;
     private ConnectBluetooth connection;
     private ProgressBar connectLoading;
-    private CustomGauge gauge;
+    private SpeedometerGauge speedometer;
 
     public static Handler myHandler;
     public final static int MSG_ERROR_BLTH=1;
     public final static int MSG_BLTH_CONNECTED=2;
     public final static int MSG_BLTH_DISCONNECTED=3;
     public final static int MSG_BLTH_RCVD=4;
+    public final static double MAX_SPEED = 1024;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +50,17 @@ public class MainActivity extends AppCompatActivity {
         outputTextView.setText("");
         findViewById(R.id.disconnectButton).setVisibility(View.GONE);
         findViewById(R.id.connectButton).setVisibility(View.VISIBLE);
-        gauge = (CustomGauge)findViewById(R.id.gauge1);
+        speedometer = (SpeedometerGauge) findViewById(R.id.speedometer);
+
+        // configure value range and ticks
+        speedometer.setMaxSpeed(MAX_SPEED);
+        speedometer.setMajorTickStep(30);
+        speedometer.setMinorTicks(2);
+
+        // Configure value range colors
+        speedometer.addColoredRange(0, MAX_SPEED/3, Color.GREEN);
+        speedometer.addColoredRange(MAX_SPEED/3, MAX_SPEED*2/3, Color.YELLOW);
+        speedometer.addColoredRange(MAX_SPEED*2/3, MAX_SPEED, Color.RED);
 
         configureBluetooth();
         new DefaultDevice(getApplicationContext());
@@ -61,14 +72,10 @@ public class MainActivity extends AppCompatActivity {
                     case MSG_BLTH_RCVD:
                         byte[] x = ((byte[])msg.obj);
 
-                        String s1 = new String();
-                        for (int i=0; i<msg.arg1; i++){
-                            s1 = s1.concat(new Byte(x[i]).toString());
-                        }
+                        int y = (x[1]<<8) | (x[0] & 0x00FF);
 
-                        gauge.setValue(x[0]);
-
-                        outputTextView.setText(s1);
+                        outputTextView.setText(Integer.valueOf(y).toString());
+                        speedometer.setSpeed(y);
                         break;
 
                     case MSG_ERROR_BLTH:

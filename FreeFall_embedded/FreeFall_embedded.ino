@@ -74,8 +74,14 @@ void setup() {
   delay(1000);
   digitalWrite(ONBOARD_LED, LOW);
 }
-int i = 0;
+
+short i = 0;
+
 void loop() {
-  Serial_blth.write(i++);
-  delay(100);
+  Serial_blth.write((char*)(&i), sizeof(i));
+  
+  //Serial_blth.write(i>>8);
+  //Serial_blth.write(i);
+  if (i++ > 1023) i = 0;
+  delay(10);
 }

@@ -8,8 +8,8 @@ android {
         applicationId "instrum.freefall_app"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0 alpha"
+        versionCode 2
+        versionName "1.1 alpha"
     }
     buildTypes {
         release {
@@ -23,5 +23,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'pl.pawelkleczkowski.customgauge:CustomGauge:1.0.1'
+    compile 'com.cardiomood.android:android-widgets:0.1.1'
 }
