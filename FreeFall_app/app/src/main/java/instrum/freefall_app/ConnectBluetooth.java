@@ -65,7 +65,7 @@ public class ConnectBluetooth extends Thread{
             return;
         }
 
-        byte[] buffer = new byte[16];  // buffer store for the stream
+        byte[] buffer = new byte[64];  // buffer store for the stream
 
         // Handshake with bluetooth device
         try {
@@ -76,12 +76,12 @@ public class ConnectBluetooth extends Thread{
 
             while (! s.contains(handshakingAns)){
                 if (mmInStream.available()>0){
-                    count = mmInStream.read(buffer, 0, 16);
+                    count = mmInStream.read(buffer, 0, 64);
                     s = s.concat(new String(buffer).substring(0, count));
                     System.out.println(s);
                 }
 
-                if (s.length() > 64){
+                if (s.length() > 256){
                     MainActivity.myHandler.obtainMessage(MainActivity.MSG_ERROR_BLTH,
                             "--Error handshaking-- ").sendToTarget();
                     this.cancel();
@@ -103,7 +103,7 @@ public class ConnectBluetooth extends Thread{
         while (true) {
             count = 0;
             try {
-                while(count < 2) {
+                while(count < 1) {
                     if (mmInStream.available() > 0) {
                         // Read from the InputStream
                         count += mmInStream.read(buffer, count, 1);

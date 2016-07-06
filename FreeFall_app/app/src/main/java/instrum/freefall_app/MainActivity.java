@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public final static int MSG_BLTH_CONNECTED=2;
     public final static int MSG_BLTH_DISCONNECTED=3;
     public final static int MSG_BLTH_RCVD=4;
-    public final static double MAX_SPEED = 1024;
+    public final static double MAX_SPEED = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +72,10 @@ public class MainActivity extends AppCompatActivity {
                     case MSG_BLTH_RCVD:
                         byte[] x = ((byte[])msg.obj);
 
-                        int y = (x[1]<<8) | (x[0] & 0x00FF);
+                        //int y = (((x[3] & 0x00FF)<<24) | ((x[2] & 0x00FF)<<16) | ((x[1] & 0x00FF)<<8) | (x[0] & 0x00FF));
+                        int y = (x[0] & 0x00FF);
 
-                        outputTextView.setText(Integer.valueOf(y).toString());
+                        outputTextView.setText(Integer.valueOf(y).toString().concat(" km/h"));
                         speedometer.setSpeed(y);
                         break;
 
